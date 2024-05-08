@@ -14,5 +14,7 @@
 
 #### 1. Remix 접속
 > Remix: <https://remix.ethereum.org/>
-#### 2. Workspace 생성
-> <img width: 
+#### 2. 빈 Workspace 생성
+> 왼쪽 상단의 workspaces 클릭 후 Create 클릭
+> <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/workspaces.png" width="250" height="400"></img>
+> Choose a template을 Blank 선택 Workspace name에 workspace 이름 적기
