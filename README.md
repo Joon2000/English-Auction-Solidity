@@ -14,7 +14,10 @@
 
 #### 1. Remix 접속
 > Remix: <https://remix.ethereum.org/>
-#### 2. 빈 Workspace 생성
-> 왼쪽 상단의 workspaces 클릭 후 Create 클릭
-> <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/workspaces.png" width="250" height="400"></img>
-> Choose a template을 Blank 선택 Workspace name에 workspace 이름 적기
+#### 2. Workspace 생성
+> 1. 왼쪽 상단의 workspaces 클릭 후 Create 클릭 <br><br>
+> <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/workspaces.png" width="250" height="400"></img><br><br><br>
+> 2. Choose a template을 Blank 선택 Workspace name에 workspace 이름 적기<br><br>
+> <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/Create%20workspace.png" width="500" height="300"></img><br><br><br>
+> 3. 모든 폴더와 파일 삭제
+> 4. contracts 폴더와 solidity 파일 생성
