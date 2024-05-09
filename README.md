@@ -12,9 +12,9 @@
 
 ## Remix 세팅
 
-#### 1. Remix 접속
+### 1. Remix 접속
 > Remix: <https://remix.ethereum.org/>
-#### 2. Workspace 생성
+### 2. Workspace 생성
 > 1. 왼쪽 상단의 workspaces 클릭 후 Create 클릭 <br><br>
 > <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/workspaces.png" width="250" height="400"></img><br><br><br>
 > 2. Choose a template을 Blank 선택 Workspace name에 workspace 이름 적기<br><br>
@@ -25,7 +25,7 @@
 
 ## 미션 진행
 
-#### 1. lisence와 solidity 컴파일 버전 설정
+### 1. lisence와 solidity 컴파일 버전 설정
 > lisence: MIT<br>
 > 컴파일 버전: ^0.8.24<br>
  ```solidity
@@ -33,7 +33,7 @@
 pragma solidity ^0.8.24;
 ```
 
-#### 2. IERC-721 interface 
+### 2. IERC-721 interface 
 > IERC721의 safeTransferFrom과 transferFrom 함수를 사용할 것입니다.
 ```solidity
 interface IERC721 {
@@ -43,7 +43,7 @@ interface IERC721 {
 }
 ```
 
-#### 3. contract 생성
+### 3. contract 생성
 > EnglishAuction contract 생성
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -58,7 +58,7 @@ interface IERC721 {
 contract EnglishAuction {}
 ```
 
-#### 4. event 설정
+### 4. event 설정
 > 4개의 event를 만들 것입니다.
 > 1. Start(): 경매가 시작되었음을 알리는 이벤트.
 > 2. Bid(address indexed sender, uint256 amount): 주소 sender에서 금액 amount으로 새로운 입찰이 이루어졌음을 알리는 이벤트.
@@ -71,7 +71,7 @@ event Withdraw(address indexed bidder, uint256 amount);
 event End(address winner, uint256 amount);
 ```
 
-#### 5. 전역변수 설정
+### 5. 전역변수 설정
 > 1. NFT 관련 변수들<br>
 > - IERC721 public nft<br>
 >> IERC721 인터페이스 타입의 public 변수. 이 변수는 경매에 사용될 NFT의 인터페이스를 참조합니다. 이를 통해 컨트랙트는 NFT의 소유권 이전과 관련된 함수들을 호출할 수 있습니다.<br>
@@ -116,7 +116,7 @@ mapping(address => uint256) public bids;
 ```
 <br>
 
-#### 6. constructor 생성
+### 6. constructor 생성
 > - 매개변수:<br>
 >> address _nft: 경매에 사용될 NFT를 대표하는 스마트 컨트랙트의 주소입니다.<br>
 >> uint256 _nftId: 경매에 사용될 NFT의 고유 식별자(ID)입니다.<br>
@@ -136,7 +136,7 @@ constructor(address _nft, uint256 _nftId, uint256 _startingBid) {
 }
 ```
 
-#### 7. function 생성
+### 7. function 생성
 > #### 1. start 함수
 > - 접근 제한자:<br>
 >> external 키워드는 이 함수가 오직 외부에서만 호출될 수 있음을 나타냅니다. 즉, 다른 컨트랙트나 트랜잭션을 통해서만 이 함수에 접근할 수 있습니다.<br>
@@ -214,22 +214,22 @@ function withdraw() external {
 }
 ```
 > #### 4. end 함수
-> - 접근 제한자:
->> external 키워드는 이 함수가 오직 외부에서만 호출될 수 있음을 나타냅니다. 즉, 다른 컨트랙트나 트랜잭션을 통해서만 이 함수에 접근할 수 있습니다.
-> - 조건 검사:
->> require(started, "not started"): 경매가 시작되었는지 확인합니다. 만약 started가 false이면 "not started"라는 메시지와 함께 실행을 중단합니다.
->> require(block.timestamp >= endAt, "not ended"): 현재 시간이 경매 종료 시간 endAt 이후인지 확인합니다. 만약 아직 경매 시간이 남아 있다면 "not ended"라는 메시지와 함께 실행을 중단합니다.
->> require(!ended, "ended"): 경매가 이미 종료되었는지 확인합니다. 만약 ended가 true이면 "ended"라는 메시지와 함께 실행을 중단합니다.
-> - 경매 상태 업데이트:
->> ended = true: 경매의 종료 상태를 true로 설정하여, 경매가 종료되었음을 나타냅니다.
-> - NFT 및 금액 전송:
->> if (highestBidder != address(0)) : 최고 입찰자가 존재하는 경우,
->> nft.safeTransferFrom(address(this), highestBidder, nftId): IERC721 인터페이스의 safeTransferFrom 함수를 사용하여 NFT를 현재 컨트랙트에서 최고 입찰자의 주소로 안전하게 전송합니다.
->> seller.transfer(highestBid): 최고 입찰 금액을 판매자의 주소로 전송합니다.
->> else {: 최고 입찰자가 없는 경우,
->> nft.safeTransferFrom(address(this), seller, nftId);: NFT를 다시 판매자에게 전송합니다.
-> - 이벤트 발생:
->> emit End(highestBidder, highestBid): End 이벤트를 발생시켜 경매의 종료를 외부에 알립니다. 이 이벤트는 최고 입찰자와 최고 입찰 금액을 포함하여, 경매의 결과를 공개합니다.
+> - 접근 제한자:<br>
+>> external 키워드는 이 함수가 오직 외부에서만 호출될 수 있음을 나타냅니다. 즉, 다른 컨트랙트나 트랜잭션을 통해서만 이 함수에 접근할 수 있습니다.<br>
+> - 조건 검사:<br>
+>> require(started, "not started"): 경매가 시작되었는지 확인합니다. 만약 started가 false이면 "not started"라는 메시지와 함께 실행을 중단합니다.<br>
+>> require(block.timestamp >= endAt, "not ended"): 현재 시간이 경매 종료 시간 endAt 이후인지 확인합니다. 만약 아직 경매 시간이 남아 있다면 "not ended"라는 메시지와 함께 실행을 중단합니다.<br>
+>> require(!ended, "ended"): 경매가 이미 종료되었는지 확인합니다. 만약 ended가 true이면 "ended"라는 메시지와 함께 실행을 중단합니다.<br>
+> - 경매 상태 업데이트:<br>
+>> ended = true: 경매의 종료 상태를 true로 설정하여, 경매가 종료되었음을 나타냅니다.<br>
+> - NFT 및 금액 전송:<br>
+>> if (highestBidder != address(0)) : 최고 입찰자가 존재하는 경우<br>
+>> nft.safeTransferFrom(address(this), highestBidder, nftId): IERC721 인터페이스의 safeTransferFrom 함수를 사용하여 NFT를 현재 컨트랙트에서 최고 입찰자의 주소로 안전하게 전송합니다.<br>
+>> seller.transfer(highestBid): 최고 입찰 금액을 판매자의 주소로 전송합니다.<br>
+>> else : 최고 입찰자가 없는 경우<br>
+>> nft.safeTransferFrom(address(this), seller, nftId): NFT를 다시 판매자에게 전송합니다.<br>
+> - 이벤트 발생:<br>
+>> emit End(highestBidder, highestBid): End 이벤트를 발생시켜 경매의 종료를 외부에 알립니다. 이 이벤트는 최고 입찰자와 최고 입찰 금액을 포함하여, 경매의 결과를 공개합니다.<br><br>
 ```soldity
 function end() external {
     require(started, "not started");
@@ -247,3 +247,121 @@ function end() external {
     emit End(highestBidder, highestBid);
 }
 ```
+## 전체 코드
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+interface IERC721 {
+    function safeTransferFrom(address from, address to, uint256 tokenId)
+        external;
+    function transferFrom(address, address, uint256) external;
+}
+
+contract EnglishAuction {
+    event Start();
+    event Bid(address indexed sender, uint256 amount);
+    event Withdraw(address indexed bidder, uint256 amount);
+    event End(address winner, uint256 amount);
+
+    IERC721 public nft;
+    uint256 public nftId;
+
+    address payable public seller;
+    uint256 public endAt;
+    bool public started;
+    bool public ended;
+
+    address public highestBidder;
+    uint256 public highestBid;
+    mapping(address => uint256) public bids;
+
+    constructor(address _nft, uint256 _nftId, uint256 _startingBid) {
+        nft = IERC721(_nft);
+        nftId = _nftId;
+
+        seller = payable(msg.sender);
+        highestBid = _startingBid;
+    }
+
+    function start() external {
+        require(!started, "started");
+        require(msg.sender == seller, "not seller");
+
+        nft.transferFrom(msg.sender, address(this), nftId);
+        started = true;
+        endAt = block.timestamp + 7 days;
+
+        emit Start();
+    }
+
+    function bid() external payable {
+        require(started, "not started");
+        require(block.timestamp < endAt, "ended");
+        require(msg.value > highestBid, "value < highest");
+
+        if (highestBidder != address(0)) {
+            bids[highestBidder] += highestBid;
+        }
+
+        highestBidder = msg.sender;
+        highestBid = msg.value;
+
+        emit Bid(msg.sender, msg.value);
+    }
+
+    function withdraw() external {
+        uint256 bal = bids[msg.sender];
+        bids[msg.sender] = 0;
+        payable(msg.sender).transfer(bal);
+
+        emit Withdraw(msg.sender, bal);
+    }
+
+    function end() external {
+        require(started, "not started");
+        require(block.timestamp >= endAt, "not ended");
+        require(!ended, "ended");
+
+        ended = true;
+        if (highestBidder != address(0)) {
+            nft.safeTransferFrom(address(this), highestBidder, nftId);
+            seller.transfer(highestBid);
+        } else {
+            nft.safeTransferFrom(address(this), seller, nftId);
+        }
+
+        emit End(highestBidder, highestBid);
+    }
+}
+```
+#### Open in [REMIX](https://remix.ethereum.org/?#code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IE1JVApwcmFnbWEgc29saWRpdHkgXjAuOC4yNDsKCmludGVyZmFjZSBJRVJDNzIxIHsKICAgIGZ1bmN0aW9uIHNhZmVUcmFuc2ZlckZyb20oYWRkcmVzcyBmcm9tLCBhZGRyZXNzIHRvLCB1aW50MjU2IHRva2VuSWQpCiAgICAgICAgZXh0ZXJuYWw7CiAgICBmdW5jdGlvbiB0cmFuc2ZlckZyb20oYWRkcmVzcywgYWRkcmVzcywgdWludDI1NikgZXh0ZXJuYWw7Cn0KCmNvbnRyYWN0IEVuZ2xpc2hBdWN0aW9uIHsKICAgIGV2ZW50IFN0YXJ0KCk7CiAgICBldmVudCBCaWQoYWRkcmVzcyBpbmRleGVkIHNlbmRlciwgdWludDI1NiBhbW91bnQpOwogICAgZXZlbnQgV2l0aGRyYXcoYWRkcmVzcyBpbmRleGVkIGJpZGRlciwgdWludDI1NiBhbW91bnQpOwogICAgZXZlbnQgRW5kKGFkZHJlc3Mgd2lubmVyLCB1aW50MjU2IGFtb3VudCk7CgogICAgSUVSQzcyMSBwdWJsaWMgbmZ0OwogICAgdWludDI1NiBwdWJsaWMgbmZ0SWQ7CgogICAgYWRkcmVzcyBwYXlhYmxlIHB1YmxpYyBzZWxsZXI7CiAgICB1aW50MjU2IHB1YmxpYyBlbmRBdDsKICAgIGJvb2wgcHVibGljIHN0YXJ0ZWQ7CiAgICBib29sIHB1YmxpYyBlbmRlZDsKCiAgICBhZGRyZXNzIHB1YmxpYyBoaWdoZXN0QmlkZGVyOwogICAgdWludDI1NiBwdWJsaWMgaGlnaGVzdEJpZDsKICAgIG1hcHBpbmcoYWRkcmVzcyA9PiB1aW50MjU2KSBwdWJsaWMgYmlkczsKCiAgICBjb25zdHJ1Y3RvcihhZGRyZXNzIF9uZnQsIHVpbnQyNTYgX25mdElkLCB1aW50MjU2IF9zdGFydGluZ0JpZCkgewogICAgICAgIG5mdCA9IElFUkM3MjEoX25mdCk7CiAgICAgICAgbmZ0SWQgPSBfbmZ0SWQ7CgogICAgICAgIHNlbGxlciA9IHBheWFibGUobXNnLnNlbmRlcik7CiAgICAgICAgaGlnaGVzdEJpZCA9IF9zdGFydGluZ0JpZDsKICAgIH0KCiAgICBmdW5jdGlvbiBzdGFydCgpIGV4dGVybmFsIHsKICAgICAgICByZXF1aXJlKCFzdGFydGVkLCAic3RhcnRlZCIpOwogICAgICAgIHJlcXVpcmUobXNnLnNlbmRlciA9PSBzZWxsZXIsICJub3Qgc2VsbGVyIik7CgogICAgICAgIG5mdC50cmFuc2ZlckZyb20obXNnLnNlbmRlciwgYWRkcmVzcyh0aGlzKSwgbmZ0SWQpOwogICAgICAgIHN0YXJ0ZWQgPSB0cnVlOwogICAgICAgIGVuZEF0ID0gYmxvY2sudGltZXN0YW1wICsgNyBkYXlzOwoKICAgICAgICBlbWl0IFN0YXJ0KCk7CiAgICB9CgogICAgZnVuY3Rpb24gYmlkKCkgZXh0ZXJuYWwgcGF5YWJsZSB7CiAgICAgICAgcmVxdWlyZShzdGFydGVkLCAibm90IHN0YXJ0ZWQiKTsKICAgICAgICByZXF1aXJlKGJsb2NrLnRpbWVzdGFtcCA8IGVuZEF0LCAiZW5kZWQiKTsKICAgICAgICByZXF1aXJlKG1zZy52YWx1ZSA+IGhpZ2hlc3RCaWQsICJ2YWx1ZSA8IGhpZ2hlc3QiKTsKCiAgICAgICAgaWYgKGhpZ2hlc3RCaWRkZXIgIT0gYWRkcmVzcygwKSkgewogICAgICAgICAgICBiaWRzW2hpZ2hlc3RCaWRkZXJdICs9IGhpZ2hlc3RCaWQ7CiAgICAgICAgfQoKICAgICAgICBoaWdoZXN0QmlkZGVyID0gbXNnLnNlbmRlcjsKICAgICAgICBoaWdoZXN0QmlkID0gbXNnLnZhbHVlOwoKICAgICAgICBlbWl0IEJpZChtc2cuc2VuZGVyLCBtc2cudmFsdWUpOwogICAgfQoKICAgIGZ1bmN0aW9uIHdpdGhkcmF3KCkgZXh0ZXJuYWwgewogICAgICAgIHVpbnQyNTYgYmFsID0gYmlkc1ttc2cuc2VuZGVyXTsKICAgICAgICBiaWRzW21zZy5zZW5kZXJdID0gMDsKICAgICAgICBwYXlhYmxlKG1zZy5zZW5kZXIpLnRyYW5zZmVyKGJhbCk7CgogICAgICAgIGVtaXQgV2l0aGRyYXcobXNnLnNlbmRlciwgYmFsKTsKICAgIH0KCiAgICBmdW5jdGlvbiBlbmQoKSBleHRlcm5hbCB7CiAgICAgICAgcmVxdWlyZShzdGFydGVkLCAibm90IHN0YXJ0ZWQiKTsKICAgICAgICByZXF1aXJlKGJsb2NrLnRpbWVzdGFtcCA+PSBlbmRBdCwgIm5vdCBlbmRlZCIpOwogICAgICAgIHJlcXVpcmUoIWVuZGVkLCAiZW5kZWQiKTsKCiAgICAgICAgZW5kZWQgPSB0cnVlOwogICAgICAgIGlmIChoaWdoZXN0QmlkZGVyICE9IGFkZHJlc3MoMCkpIHsKICAgICAgICAgICAgbmZ0LnNhZmVUcmFuc2ZlckZyb20oYWRkcmVzcyh0aGlzKSwgaGlnaGVzdEJpZGRlciwgbmZ0SWQpOwogICAgICAgICAgICBzZWxsZXIudHJhbnNmZXIoaGlnaGVzdEJpZCk7CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgbmZ0LnNhZmVUcmFuc2ZlckZyb20oYWRkcmVzcyh0aGlzKSwgc2VsbGVyLCBuZnRJZCk7CiAgICAgICAgfQoKICAgICAgICBlbWl0IEVuZChoaWdoZXN0QmlkZGVyLCBoaWdoZXN0QmlkKTsKICAgIH0KfQo&lang=en&optimize=false&runs=200&evmVersion=null&version=soljson-v0.8.25+commit.b61c2a91.js)
+
+## 실행
+
+#### 실행을 위해서는 ERC-721 NFT가 필용합니다.
+토큰이 없을 경우 아래 ERC-721 smart contract를 사용하세요
+```solidity
+// SPDX-License-Identifier: MIT
+// Compatible with OpenZeppelin Contracts ^5.0.0
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyToken is ERC721, Ownable {
+    uint256 private _nextTokenId;
+
+    constructor(address initialOwner)
+        ERC721("MyToken", "MTK")
+        Ownable(initialOwner)
+    {}
+
+    function safeMint(address to) public onlyOwner {
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(to, tokenId);
+    }
+}
+```
+이 컨트랙트는 mint 할 때마다 토큰아이디가 1씩 증각합니다.
+
