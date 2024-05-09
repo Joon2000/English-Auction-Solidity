@@ -365,3 +365,6 @@ contract MyToken is ERC721, Ownable {
 ```
 이 컨트랙트는 mint 할 때마다 토큰아이디가 1씩 증각합니다.
 
+### 폴더 구조
+아래와 같은 폴더 구조를 만들어야 합니다. <br><br>
+<img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/%E1%84%91%E1%85%A9%E1%86%AF%E1%84%83%E1%85%A5%E1%84%80%E1%85%AE%E1%84%8C%E1%85%A9.png" width="250" height="400"></img>
