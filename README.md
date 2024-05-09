@@ -72,3 +72,178 @@ event End(address winner, uint256 amount);
 ```
 
 #### 5. 전역변수 설정
+> 1. NFT 관련 변수들<br>
+> - IERC721 public nft<br>
+>> IERC721 인터페이스 타입의 public 변수. 이 변수는 경매에 사용될 NFT의 인터페이스를 참조합니다. 이를 통해 컨트랙트는 NFT의 소유권 이전과 관련된 함수들을 호출할 수 있습니다.<br>
+> - uint256 public nftId<br>
+>> 경매에 사용될 NFT의 고유 식별자(ID)입니다. 이 ID는 특정 NFT를 구분하고 참조하는 데 사용됩니다.<br><br>
+```solidity
+IERC721 public nft;
+uint256 public nftId;
+```
+
+> 2. 옥션 관련 변수들<br>
+> - address payable public seller<br>
+>> NFT 판매자의 주소를 저장하는 변수입니다. 이 주소는 이더리움 네트워크 상의 지불 가능한 주소 형태로, 경매 종료 후 최고 입찰 금액을 이 주소로 전송합니다.<br>
+> - uint256 public endAt<br>
+>> 경매 종료 시점을 나타내는 타임스탬프입니다. 이 시점 이후에는 더 이상 입찰을 받지 않습니다.<br>
+> - bool public started<br>
+>> 경매가 시작되었는지 여부를 나타내는 부울 변수입니다. 경매 시작 시 true로 설정되고, 그 전까지는 false입니다.<br>
+> - bool public ended<br>
+>> 경매가 종료되었는지 여부를 나타내는 부울 변수입니다. 경매 종료 시 true로 설정됩니다.<br>
+> - address public highestBidder<br>
+>> 현재 최고 입찰자의 주소를 저장하는 변수입니다. 이 주소는 가장 높은 입찰을 한 참가자를 나타냅니다.<br>
+> - uint256 public highestBid<br>
+>> 현재까지의 최고 입찰 금액을 저장하는 변수입니다. 이 금액은 경매에서 가장 높은 금액으로 입찰된 값입니다.<br>
+> - mapping(address => uint256) public bids<br>
+>> 각 주소에 대해 입찰된 금액을 저장하는 매핑입니다. 이는 입찰자가 입찰한 금액을 관리하고, 나중에 최고 입찰자가 아닌 경우 금액을 회수할 수 있도록 합니다.<br><br>
+```solidity
+address payable public seller;
+uint256 public endAt;
+bool public started;
+bool public ended;
+
+address public highestBidder;
+uint256 public highestBid;
+mapping(address => uint256) public bids;address payable public seller;
+uint256 public endAt;
+bool public started;
+bool public ended;
+
+address public highestBidder;
+uint256 public highestBid;
+mapping(address => uint256) public bids;
+```
+<br>
+
+#### 6. constructor 생성
+> - 매개변수:<br>
+>> address _nft: 경매에 사용될 NFT를 대표하는 스마트 컨트랙트의 주소입니다.<br>
+>> uint256 _nftId: 경매에 사용될 NFT의 고유 식별자(ID)입니다.<br>
+>> uint256 _startingBid: 경매 시작 시의 최저 입찰 금액입니다.<br>
+> - 기능:<br>
+>> nft = IERC721(_nft);: 주어진 주소 _nft에서 IERC721 인터페이스를 구현하는 컨트랙트를 참조하여, nft 변수에 할당합니다. 이를 통해 경매 컨트랙트는 해당 NFT에 대한 다양한 작업을 수행할 수 있습니다.<br>
+>> nftId = _nftId;: 입력받은 NFT의 ID를 nftId 변수에 저장합니다. 이 ID는 특정 NFT를 경매 컨트랙트에서 참조하고 관리하는 데 사용됩니다.<br>
+>> seller = payable(msg.sender);: 컨트랙트를 배포하는 주체(보통 NFT의 소유자)의 주소를 seller 변수에 저장합니다. payable 키워드는 이 주소가 이더리움을 수신할 수 있도록 합니다.<br>
+>> highestBid = _startingBid;: 경매의 시작 입찰 금액을 highestBid 변수에 설정합니다. 이 금액은 경매 동안 다른 입찰자들이 이 금액 이상을 제시해야 하는 최소 금액을 정의합니다.<br><br>
+```solidity
+constructor(address _nft, uint256 _nftId, uint256 _startingBid) {
+    nft = IERC721(_nft);
+    nftId = _nftId;
+
+    seller = payable(msg.sender);
+    highestBid = _startingBid;
+}
+```
+
+#### 7. function 생성
+> #### 1. start 함수
+> - 접근 제한자:<br>
+>> external 키워드는 이 함수가 오직 외부에서만 호출될 수 있음을 나타냅니다. 즉, 다른 컨트랙트나 트랜잭션을 통해서만 이 함수에 접근할 수 있습니다.<br>
+조건 검사:<br>
+> - require(!started, "started"): 이 조건은 started 변수가 false일 경우에만 함수가 실행되도록 합니다. 만약 이미 started가 true이면 "started"라는 에러 메시지와 함께 실행이 중단됩니다.<br>
+>> require(msg.sender == seller, "not seller"): 이 조건은 함수를 호출하는 주체(msg.sender)가 seller 변수에 저장된 주소와 일치할 때만 함수가 실행되도록 합니다. 만약 주소가 일치하지 않으면 "not seller"라는 에러 메시지와 함께 실행이 중단됩니다.<br>
+> - NFT 이전:<br>
+>> nft.transferFrom(msg.sender, address(this), nftId): IERC721 인터페이스의 transferFrom 함수를 호출하여 msg.sender로부터 현재 컨트랙트(address(this))로 nftId에 해당하는 NFT를 이전합니다. 이는 경매 컨트랙트가 NFT의 임시 소유권을 가지게 하여, 경매가 종료될 때 승리자에게 NFT를 안전하게 전송할 수 있도록 합니다.<br>
+> - 경매 상태 업데이트:<br>
+>> started = true: 경매가 시작되었음을 나타내기 위해 started 변수를 true로 설정합니다.<br>
+>> endAt = block.timestamp + 7 days;: endAt 변수에 현재 블록 타임스탬프에 7일을 더한 값을 저장합니다. 이는 경매 종료 시점을 설정합니다.<br>
+> - 이벤트 발생:<br>
+>> emit Start(): Start 이벤트를 발생시켜 경매의 시작을 외부에 알립니다. 이 이벤트는 경매 참여자들에게 경매가 시작되었음을 알리는 신호로 작용합니다.<br><br>
+```solidity
+function start() external {
+    require(!started, "started");
+    require(msg.sender == seller, "not seller");
+
+    nft.transferFrom(msg.sender, address(this), nftId);
+    started = true;
+    endAt = block.timestamp + 7 days;
+
+    emit Start();
+}
+```
+> #### 2. bid 함수
+> - 접근 제한자와 페이어블:<br>
+>> external 키워드는 이 함수가 오직 외부에서만 호출될 수 있음을 나타냅니다.<br>
+>> payable 키워드는 이 함수가 이더리움을 전송받을 수 있도록 하며, 이는 입찰 시 전송되는 금액을 받기 위해 필요합니다.<br>
+> - 조건 검사:<br>
+>> require(started, "not started");: 경매가 시작되었는지 확인합니다. 만약 started가 false이면 "not started"라는 메시지와 함께 실행을 중단합니다.<br>
+>> require(block.timestamp < endAt, "ended"): 현재 시간이 경매 종료 시간 endAt보다 이전인지 확인합니다. 만약 이미 경매가 종료되었다면 "ended"라는 메시지와 함께 실행을 중단합니다.<br>
+>> require(msg.value > highestBid, "value < highest"): 전송된 금액(msg.value)이 현재의 최고 입찰 금액(highestBid)보다 큰지 확인합니다. 만약 그렇지 않다면 "value < highest"라는 메시지와 함께 실행을 중단합니다.<br>
+> - 최고 입찰자 갱신:<br>
+>> if (highestBidder != address(0)): 이전 최고 입찰자가 존재하는 경우 (즉, highestBidder 주소가 0 주소가 아닌 경우)<br>
+>> bids[highestBidder] += highestBid: 이전 최고 입찰자의 입찰금을 bids 매핑에 더해 입찰금을 갱신합니다. 이를 통해 이전 최고 입찰자가 다음에 입찰금을 철회할 수 있도록 합니다.<br>
+> - 새로운 최고 입찰자 설정:<br>
+>> highestBidder = msg.sender: 현재 함수를 호출한 주소(msg.sender)를 새로운 최고 입찰자로 설정합니다.<br>
+>> highestBid = msg.value: 전송된 금액(msg.value)을 새로운 최고 입찰 금액으로 설정합니다.<br>
+> - 이벤트 발생:<br>
+>> emit Bid(msg.sender, msg.value): Bid 이벤트를 발생시켜 새로운 입찰 정보를 외부에 알립니다. 이 이벤트는 입찰이 성공적으로 이루어졌음을 나타내며, 입찰자와 입찰 금액을 포함합니다.<br><br>
+```solidity
+function bid() external payable {
+    require(started, "not started");
+    require(block.timestamp < endAt, "ended");
+    require(msg.value > highestBid, "value < highest");
+
+    if (highestBidder != address(0)) {
+        bids[highestBidder] += highestBid;
+    }
+
+    highestBidder = msg.sender;
+    highestBid = msg.value;
+
+    emit Bid(msg.sender, msg.value);
+}
+```
+> #### 3. withdraw 함수
+> - 접근 제한자:<br>
+>> external 키워드는 이 함수가 오직 외부에서만 호출될 수 있음을 나타냅니다. 즉, 다른 컨트랙트나 트랜잭션을 통해서만 이 함수에 접근할 수 있습니다.<br>
+> - 입찰금 철회 로직:<br>
+>> uint256 bal = bids[msg.sender]: 함수를 호출한 주소(msg.sender)의 현재 입찰금을 bids 매핑에서 조회하여 bal 변수에 저장합니다.<br>
+>> bids[msg.sender] = 0: 해당 주소의 입찰금 정보를 bids 매핑에서 0으로 초기화하여, 다시 입찰금을 철회하려는 시도가 없도록 합니다.<br>
+> - 금액 전송:<br>
+>> payable(msg.sender).transfer(bal): 초기화된 입찰금 bal을 함수를 호출한 주소(msg.sender)로 전송합니다. payable 키워드는 이더리움 주소가 이더를 수신할 수 있게 해주며, transfer 함수를 사용해 안전하게 이더를 해당 주소로 송금합니다.<br>
+> - 이벤트 발생:<br>
+>> emit Withdraw(msg.sender, bal): Withdraw 이벤트를 발생시켜 입찰금 철회 정보를 외부에 알립니다. 이 이벤트는 입찰금 철회가 성공적으로 이루어졌음을 나타내며, 입찰금을 철회한 주소와 철회한 금액을 포함합니다.<br><br>
+```solidity
+function withdraw() external {
+    uint256 bal = bids[msg.sender];
+    bids[msg.sender] = 0;
+    payable(msg.sender).transfer(bal);
+
+    emit Withdraw(msg.sender, bal);
+}
+```
+> #### 4. end 함수
+> - 접근 제한자:
+>> external 키워드는 이 함수가 오직 외부에서만 호출될 수 있음을 나타냅니다. 즉, 다른 컨트랙트나 트랜잭션을 통해서만 이 함수에 접근할 수 있습니다.
+> - 조건 검사:
+>> require(started, "not started"): 경매가 시작되었는지 확인합니다. 만약 started가 false이면 "not started"라는 메시지와 함께 실행을 중단합니다.
+>> require(block.timestamp >= endAt, "not ended"): 현재 시간이 경매 종료 시간 endAt 이후인지 확인합니다. 만약 아직 경매 시간이 남아 있다면 "not ended"라는 메시지와 함께 실행을 중단합니다.
+>> require(!ended, "ended"): 경매가 이미 종료되었는지 확인합니다. 만약 ended가 true이면 "ended"라는 메시지와 함께 실행을 중단합니다.
+> - 경매 상태 업데이트:
+>> ended = true: 경매의 종료 상태를 true로 설정하여, 경매가 종료되었음을 나타냅니다.
+> - NFT 및 금액 전송:
+>> if (highestBidder != address(0)) : 최고 입찰자가 존재하는 경우,
+>> nft.safeTransferFrom(address(this), highestBidder, nftId): IERC721 인터페이스의 safeTransferFrom 함수를 사용하여 NFT를 현재 컨트랙트에서 최고 입찰자의 주소로 안전하게 전송합니다.
+>> seller.transfer(highestBid): 최고 입찰 금액을 판매자의 주소로 전송합니다.
+>> else {: 최고 입찰자가 없는 경우,
+>> nft.safeTransferFrom(address(this), seller, nftId);: NFT를 다시 판매자에게 전송합니다.
+> - 이벤트 발생:
+>> emit End(highestBidder, highestBid): End 이벤트를 발생시켜 경매의 종료를 외부에 알립니다. 이 이벤트는 최고 입찰자와 최고 입찰 금액을 포함하여, 경매의 결과를 공개합니다.
+```soldity
+function end() external {
+    require(started, "not started");
+    require(block.timestamp >= endAt, "not ended");
+    require(!ended, "ended");
+
+    ended = true;
+    if (highestBidder != address(0)) {
+        nft.safeTransferFrom(address(this), highestBidder, nftId);
+        seller.transfer(highestBid);
+    } else {
+        nft.safeTransferFrom(address(this), seller, nftId);
+    }
+
+    emit End(highestBidder, highestBid);
+}
+```
