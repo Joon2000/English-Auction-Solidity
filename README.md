@@ -382,15 +382,13 @@ contract MyToken is ERC721, Ownable {
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/MyTokenApprove.png" width="250" height="450"></img><br><br>
 > #### Auction 버튼 조작
 > <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/EnglishAuctionButton.png" width="250" height="450"></img><br><br>
-> 3. 먼저 auction을 시작하기 위히서 start버튼을 누릅니다. 이제 옥션이 시작한겁니다. 이때 사인하는 주소가 English Auction contract를 deploy한 주소와 동일해야 합니다. <br>
+> 3. 먼저 auction을 시작하기 위히서 start버튼을 누릅니다. 이제 옥션이 시작한겁니다. 이때 사인하는 주소가 English Auction contract를 deploy한 주소와 동일해야 합니다. <br><br>
 > 4. 파란색 버튼들을 실행해보면 모두 정상 작동하는거를 확인할 수 있습니다. 이때 아직 아무도 bid를 하지 않았기 때문에 이 주소는 비어 있습니다.<br><br>
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/EnglishAuctionBlueButton.png" width="250" height="450"></img><br><br>
 > 5. 다른 주소로 바꿉니다. <br><br>
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/RemixAddress.png" width="250" height="450"></img><br><br>
 > 6. Value를 2ETH로 바꾼 후 bid 버튼을 누릅니다. contract의 balance가 2ETH로 바뀌고 highestBid와 highestBidder가 바뀐 것을 확인할 수 있습니다.<br><br>
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/bidValue.png" width="250" height="450"></img><br><br>
-> 7. 주소와 bid하는 value를 바꿔가면 옥션을 진행합니다.
-> 8. withdraw 함수는 해당 주소의 bid를 contract로부터 돌려받을 수 있습니다. 이때 highestBidder눈 withdraw 할 수 없습니다.
-require(msg.sender != highestBidder);
-```
+> 7. 주소와 bid하는 value를 바꿔가면 옥션을 진행합니다.<br><br>
+> 8. withdraw 함수는 해당 주소의 bid를 contract로부터 돌려받을 수 있습니다. 이때 highestBidder눈 withdraw 할 수 없습니다.<br><br>
 > 10. 7일 이후에 end 함수를 누르면 옥션을 정지하고 highestbid만큼의 ETH가 seller의 주소로 전달됩니다. 
