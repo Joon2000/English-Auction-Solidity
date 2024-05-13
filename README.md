@@ -63,7 +63,7 @@ contract EnglishAuction {}
 > 1. Start(): 경매가 시작되었음을 알리는 이벤트.
 > 2. Bid(address indexed sender, uint256 amount): 주소 sender에서 금액 amount으로 새로운 입찰이 이루어졌음을 알리는 이벤트.
 > 3. Withdraw(address indexed bidder, uint256 amount): 주소 bidder가 입찰 금액 amount을 철회함을 알리는 이벤트.
-> 4. End(address winner, uint256 amount): 경매가 종료되었으며, winner가 최고 입찰 금액 amount로 승리함을 알리는 이벤트. <br><br>
+> 4. End(address winner, uint256 amount): 경매가 종료됨을 알리는 이벤트. <br><br>
 ```solidity
 event Start();
 event Bid(address indexed sender, uint256 amount);
@@ -88,13 +88,13 @@ uint256 public nftId;
 > - uint256 public endAt<br>
 >> 경매 종료 시점을 나타내는 타임스탬프입니다. 이 시점 이후에는 더 이상 입찰을 받지 않습니다.<br>
 > - bool public started<br>
->> 경매가 시작되었는지 여부를 나타내는 부울 변수입니다. 경매 시작 시 true로 설정되고, 그 전까지는 false입니다.<br>
+>> 경매가 시작되었는지 여부를 나타내는 변수입니다. 경매 시작 시 true로 설정되고, 그 전까지는 false입니다.<br>
 > - bool public ended<br>
->> 경매가 종료되었는지 여부를 나타내는 부울 변수입니다. 경매 종료 시 true로 설정됩니다.<br>
+>> 경매가 종료되었는지 여부를 나타내는 변수입니다. 경매 종료 시 true로 설정됩니다.<br>
 > - address public highestBidder<br>
->> 현재 최고 입찰자의 주소를 저장하는 변수입니다. 이 주소는 가장 높은 입찰을 한 참가자를 나타냅니다.<br>
+>> 현재 최고 입찰자의 주소를 저장하는 변수입니다.<br>
 > - uint256 public highestBid<br>
->> 현재까지의 최고 입찰 금액을 저장하는 변수입니다. 이 금액은 경매에서 가장 높은 금액으로 입찰된 값입니다.<br>
+>> 현재까지의 최고 입찰 금액을 저장하는 변수입니다.<br>
 > - mapping(address => uint256) public bids<br>
 >> 각 주소에 대해 입찰된 금액을 저장하는 매핑입니다. 이는 입찰자가 입찰한 금액을 관리하고, 나중에 최고 입찰자가 아닌 경우 금액을 회수할 수 있도록 합니다.<br><br>
 ```solidity
@@ -122,10 +122,10 @@ mapping(address => uint256) public bids;
 >> uint256 _nftId: 경매에 사용될 NFT의 고유 식별자(ID)입니다.<br>
 >> uint256 _startingBid: 경매 시작 시의 최저 입찰 금액입니다.<br>
 > - 기능:<br>
->> nft = IERC721(_nft);: 주어진 주소 _nft에서 IERC721 인터페이스를 구현하는 컨트랙트를 참조하여, nft 변수에 할당합니다. 이를 통해 경매 컨트랙트는 해당 NFT에 대한 다양한 작업을 수행할 수 있습니다.<br>
->> nftId = _nftId;: 입력받은 NFT의 ID를 nftId 변수에 저장합니다. 이 ID는 특정 NFT를 경매 컨트랙트에서 참조하고 관리하는 데 사용됩니다.<br>
->> seller = payable(msg.sender);: 컨트랙트를 배포하는 주체(보통 NFT의 소유자)의 주소를 seller 변수에 저장합니다. payable 키워드는 이 주소가 이더리움을 수신할 수 있도록 합니다.<br>
->> highestBid = _startingBid;: 경매의 시작 입찰 금액을 highestBid 변수에 설정합니다. 이 금액은 경매 동안 다른 입찰자들이 이 금액 이상을 제시해야 하는 최소 금액을 정의합니다.<br><br>
+>> nft = IERC721(_nft): 주어진 주소 _nft에서 IERC721 인터페이스를 구현하는 컨트랙트를 참조하여, nft 변수에 할당합니다. 이를 통해 경매 컨트랙트는 해당 NFT에 대한 다양한 작업을 수행할 수 있습니다.<br>
+>> nftId = _nftId: 입력받은 NFT의 ID를 nftId 변수에 저장합니다. 이 ID는 특정 NFT를 경매 컨트랙트에서 참조하고 관리하는 데 사용됩니다.<br>
+>> seller = payable(msg.sender): 컨트랙트를 배포하는 주체(보통 NFT의 소유자)의 주소를 seller 변수에 저장합니다. payable 키워드는 이 주소가 이더리움을 수신할 수 있도록 합니다.<br>
+>> highestBid = _startingBid: 경매의 시작 입찰 금액을 highestBid 변수에 설정합니다. 이 금액은 경매 동안 다른 입찰자들이 이 금액 이상을 제시해야 하는 최소 금액을 정의합니다.<br><br>
 ```solidity
 constructor(address _nft, uint256 _nftId, uint256 _startingBid) {
     nft = IERC721(_nft);
@@ -144,10 +144,10 @@ constructor(address _nft, uint256 _nftId, uint256 _startingBid) {
 > - require(!started, "started"): 이 조건은 started 변수가 false일 경우에만 함수가 실행되도록 합니다. 만약 이미 started가 true이면 "started"라는 에러 메시지와 함께 실행이 중단됩니다.<br>
 >> require(msg.sender == seller, "not seller"): 이 조건은 함수를 호출하는 주체(msg.sender)가 seller 변수에 저장된 주소와 일치할 때만 함수가 실행되도록 합니다. 만약 주소가 일치하지 않으면 "not seller"라는 에러 메시지와 함께 실행이 중단됩니다.<br>
 > - NFT 이전:<br>
->> nft.transferFrom(msg.sender, address(this), nftId): IERC721 인터페이스의 transferFrom 함수를 호출하여 msg.sender로부터 현재 컨트랙트(address(this))로 nftId에 해당하는 NFT를 이전합니다. 이는 경매 컨트랙트가 NFT의 임시 소유권을 가지게 하여, 경매가 종료될 때 승리자에게 NFT를 안전하게 전송할 수 있도록 합니다.<br>
+>> nft.transferFrom(msg.sender, address(this), nftId): IERC721 인터페이스의 transferFrom 함수를 호출하여 msg.sender로부터 현재 컨트랙트(address(this))로 nftId에 해당하는 NFT를 이전합니다. 이는 경매 컨트랙트(English Auction Contract)가 NFT의 임시 소유권을 가지게 하여, 경매가 종료될 때 승리자에게 NFT를 안전하게 전송할 수 있도록 합니다.<br>
 > - 경매 상태 업데이트:<br>
 >> started = true: 경매가 시작되었음을 나타내기 위해 started 변수를 true로 설정합니다.<br>
->> endAt = block.timestamp + 7 days;: endAt 변수에 현재 블록 타임스탬프에 7일을 더한 값을 저장합니다. 이는 경매 종료 시점을 설정합니다.<br>
+>> endAt = block.timestamp + 7 days;: endAt 변수에 현재 블록 타임스탬프에 7일을 더한 값을 저장합니다(초 단위로 저장됩니다). 이는 경매 종료 시점을 설정합니다.<br>
 > - 이벤트 발생:<br>
 >> emit Start(): Start 이벤트를 발생시켜 경매의 시작을 외부에 알립니다. 이 이벤트는 경매 참여자들에게 경매가 시작되었음을 알리는 신호로 작용합니다.<br><br>
 ```solidity
@@ -163,7 +163,7 @@ function start() external {
 }
 ```
 > #### 2. bid 함수
-> - 접근 제한자와 페이어블:<br>
+> - 접근 제한자와 페이어블(payable):<br>
 >> external 키워드는 이 함수가 오직 외부에서만 호출될 수 있음을 나타냅니다.<br>
 >> payable 키워드는 이 함수가 이더리움을 전송받을 수 있도록 하며, 이는 입찰 시 전송되는 금액을 받기 위해 필요합니다.<br>
 > - 조건 검사:<br>
@@ -227,7 +227,7 @@ function withdraw() external {
 >> nft.safeTransferFrom(address(this), highestBidder, nftId): IERC721 인터페이스의 safeTransferFrom 함수를 사용하여 NFT를 현재 컨트랙트에서 최고 입찰자의 주소로 안전하게 전송합니다.<br>
 >> seller.transfer(highestBid): 최고 입찰 금액을 판매자의 주소로 전송합니다.<br>
 >> else : 최고 입찰자가 없는 경우<br>
->> nft.safeTransferFrom(address(this), seller, nftId): NFT를 다시 판매자에게 전송합니다.<br>
+>> nft.safeTransferFrom(address(this), seller, nftId): NFT를 다시 판매자에게 전송합니다. safeTransferFrom 함수는 to 주소에서 토큰을 받았는지 확인하는 과정을 포함합니다.<br>
 > - 이벤트 발생:<br>
 >> emit End(highestBidder, highestBid): End 이벤트를 발생시켜 경매의 종료를 외부에 알립니다. 이 이벤트는 최고 입찰자와 최고 입찰 금액을 포함하여, 경매의 결과를 공개합니다.<br><br>
 ```soldity
@@ -376,7 +376,7 @@ contract MyToken is ERC721, Ownable {
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/myTokenButton.png" width="250" height="450"></img><br><br>
 
 ### English Auction 실행
-> 1. EnglishAuction contract를 deploy 합니다. 아래 이미지와 같이 만든 후 deploy 버튼을 누르면 됩니다. 이때 _NFT에는 위에서 deploy한 NFT 주소를, _NFTID에는 0(한개밖에 mint안했기 때문에)을, _STARTINGBID에는 1ETH를 입력하기 위해서 1*10^18(wei 단위)을 넣어줍니다. <br><br>
+> 1. EnglishAuction contract를 deploy 합니다. 아래 이미지와 같이 만든 후 deploy 버튼을 누르면 됩니다. 이때 _NFT에는 위에서 deploy한 NFT 주소를, _NFTID에는 0(한개밖에 mint 안했기 때문에)을, _STARTINGBID에는 1ETH를 입력하기 위해서 1*10^18(wei 단위)을 넣어줍니다. <br><br>
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/EnglishAuctionDeploy.png" width="250" height="450"></img><br><br>
 > 2. EnglishAuction contract가 IERC721의 transferFrom함수를 사용하기 위해서는 해당 nft의 ID에 대한 approve가 되어 있어야 합니다. MyToken contract의 approve 버튼 옆에 EnglishAuction contract의 주소를 입력 후 클릭합니다.<br><br>
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/MyTokenApprove.png" width="250" height="450"></img><br><br>
@@ -390,8 +390,7 @@ contract MyToken is ERC721, Ownable {
 > 6. Value를 2ETH로 바꾼 후 bid 버튼을 누릅니다. contract의 balance가 2ETH로 바뀌고 highestBid와 highestBidder가 바뀐 것을 확인할 수 있습니다.<br><br>
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/bidValue.png" width="250" height="450"></img><br><br>
 > 7. 주소와 bid하는 value를 바꿔가면 옥션을 진행합니다.
-> 8. withdraw 함수는 해당 주소의 bid를 contract로부터 돌려받을 수 있습니다. 이때 highestBidder가 자신의 ETH를 withdraw할 경우 에러가 발생할 수 있습니다. 이 경우를 배재하고 싶으시면 아래 코드를 withdraw 함수 가장 위에 삽입해 주시면 됩니다.
-```solditiy
+> 8. withdraw 함수는 해당 주소의 bid를 contract로부터 돌려받을 수 있습니다. 이때 highestBidder눈 withdraw 할 수 없습니다.
 require(msg.sender != highestBidder);
 ```
 > 10. 7일 이후에 end 함수를 누르면 옥션을 정지하고 highestbid만큼의 ETH가 seller의 주소로 전달됩니다. 
