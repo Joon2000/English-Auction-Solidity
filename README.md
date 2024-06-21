@@ -371,7 +371,7 @@ contract MyToken is ERC721, Ownable {
 
 ### MyToken Mint
 > MyToken contract를 컴파일 후 deploy합니다. 아래와 같이 세팅 후 deploy하면 됩니다.<br><br>
-<img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/EnglishAuctionDeploy.png" width="250" height="450"></img><br><br>
+<img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/myTokenDeploy.png" width="250" height="450"></img><br><br>
 > NFT를 민트합니다. Deployed/Unpinned Contracts에서 deploy한 contract를 클릭합니다. 그 후 아래와 같은 버튼들 중 safeMint 버튼 옆에 주소 적는 빈칸에 본인이 원하는 주소(본인의 주소를 추천합니다)를 넣고 버튼을 클릭하면 됩니다.<br><br>
 <img src="https://github.com/Joon2000/English-Auction-Solidity/blob/main/images/myTokenButton.png" width="250" height="450"></img><br><br>
 
